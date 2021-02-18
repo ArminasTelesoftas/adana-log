@@ -1,0 +1,132 @@
+{
+  "name": "adana-log",
+  "description": "Tool for Adana",
+  "author": {
+    "name": "Adana",
+    "email": "arminas.musteikis@telesoftas.com",
+    "url": "arminas.musteikis@telesoftas.com"
+  },
+  "version": "1.0.0",
+  "private": false,
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "build-local": "react-scripts build && yarn build-electron",
+    "start-react": "export BROWSER=none && react-scripts start",
+    "start-electron": "export ELECTRON_START_URL=http://localhost:3000 && electron .",
+    "build-electron": "mkdir build/src && cp -r electron/. build/electron && cp -r src/shared/. build/src/shared",
+    "build-electron:win": "mkdir build\\src && mkdir build\\electron && mkdir build\\src\\shared &&  xcopy electron build\\electron /E/H && xcopy src\\shared build\\src\\shared /E/H",
+    "build": "react-scripts build && yarn build-electron",
+    "build:win": "react-scripts build && yarn build-electron:win",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "package": "electron-builder build --linux -c.extraMetadata.main=build/electron/main.js --publish never",
+    "deploy": "electron-builder build --linux -c.extraMetadata.main=build/electron/main.js --publish always"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArminasTelesoftas/adana-log.git"
+  },
+  "build": {
+    "publish": {
+      "provider": "github"
+    },
+    "appId": "com.adana-log.app",
+    "extends": null,
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    }
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@date-io/date-fns": "^1.3.13",
+    "@hookform/resolvers": "^1.3.4",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/data-grid": "^4.0.0-alpha.11",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
+    "@material-ui/pickers": "^3.2.10",
+    "@sentry/electron": "^2.3.0",
+    "@sentry/react": "^6.1.0",
+    "@sentry/tracing": "^6.1.0",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/lodash": "^4.14.167",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.53",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-redux": "^7.1.11",
+    "@types/react-router-dom": "^5.1.6",
+    "@types/yup": "^0.29.11",
+    "axios": "^0.21.0",
+    "clsx": "^1.1.1",
+    "date-fns": "^2.16.1",
+    "electron-store": "^7.0.2",
+    "electron-updater": "^4.3.5",
+    "lodash": "^4.17.20",
+    "materialui-daterange-picker": "^1.1.92",
+    "nanoid": "^3.1.20",
+    "node-fetch": "^2.6.1",
+    "npm": "^6.14.11",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-hook-form": "^6.12.2",
+    "react-redux": "^7.2.2",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.1",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "typescript": "^4.0.3",
+    "web-vitals": "^0.2.4",
+    "yup": "^0.32.8"
+  },
+  "devDependencies": {
+    "electron": "^11.0.3",
+    "electron-builder": "^22.9.1",
+    "electron-reload": "^1.5.0",
+    "prettier": "^2.2.1"
+  },
+  "prettier": {
+    "printWidth": 100
+  }
+}

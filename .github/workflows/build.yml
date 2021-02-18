@@ -1,0 +1,111 @@
+name: Build/release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "package.json"
+
+jobs:
+  version-bump:
+    name: "Bump Version"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v2"
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.github_token }}
+
+      - name: "Automated Version Bump"
+        uses: "phips28/gh-action-bump-version@master"
+        with:
+          tag-prefix: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+  package-release:
+    name: "Package"
+    needs: version-bump
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v2"
+        with:
+          ref: main
+
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn --network-timeout 1000000
+
+      - name: Build Windows
+        if: startsWith(matrix.os, 'windows')
+        run: yarn build:win
+
+      - name: Build MacOS
+        if: startsWith(matrix.os, 'macos')
+        run: yarn build
+
+      - name: Build Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        run: yarn build
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1.6.0
+        with:
+          github_token: ${{ secrets.github_token }}
+          skip_build: true
+          release: true
+          args: -c.extraMetadata.main=build/electron/main.js
+
+  publish-release:
+    name: "Publish"
+    needs: package-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@master"
+
+      - name: Get version
+        id: version
+        run: echo "::set-output name=version::$(echo "${{ steps.previoustag.outputs.tag }}" | cut -c2-15)"
+
+      - name: Publish release on GitHub
+        uses: test-room-7/action-publish-release-drafts@v0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          tag-name: ${{ steps.version.outputs.version }}
