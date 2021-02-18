@@ -6,7 +6,7 @@
     "email": "arminas.musteikis@telesoftas.com",
     "url": "arminas.musteikis@telesoftas.com"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "main": "electron/main.js",
   "homepage": "./",
